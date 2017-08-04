@@ -126,7 +126,7 @@ open class Heimdall {
         }
     }
     
-    fileprivate init(scope: ScopeOptions, publicTag: String, privateTag: String?) {
+    public init(scope: ScopeOptions, publicTag: String, privateTag: String?) {
         self.publicTag = publicTag
         self.privateTag = privateTag
         self.scope = scope
@@ -141,6 +141,14 @@ open class Heimdall {
     ///
     open func publicKeyDataX509() -> Data? {
         if let keyData = obtainKeyData(.public) {
+            return keyData.dataByPrependingX509Header()
+        }
+        
+        return nil
+    }
+    
+    open func privateKeyDataX509() -> Data? {
+        if let keyData = obtainKeyData(.private) {
             return keyData.dataByPrependingX509Header()
         }
         
@@ -163,6 +171,10 @@ open class Heimdall {
     ///
     open func publicKeyData() -> Data? {
         return obtainKeyData(.public)
+    }
+    
+    open func privateKeyData() -> Data? {
+        return obtainKeyData(.private)
     }
     
     ///
@@ -516,14 +528,14 @@ open class Heimdall {
         case `private`
     }
     
-    fileprivate struct ScopeOptions: OptionSet {
+    public struct ScopeOptions: OptionSet {
         fileprivate var value: UInt
         
         init(_ rawValue: UInt) { self.value = rawValue }
-        init(rawValue: UInt) { self.value = rawValue }
+        public init(rawValue: UInt) { self.value = rawValue }
         init(nilLiteral: ()) { self.value = 0}
         
-        var rawValue: UInt { return self.value }
+        public var rawValue: UInt { return self.value }
         var boolValue: Bool { return self.value != 0 }
         
         static var allZeros: ScopeOptions { return self.init(0) }
@@ -753,7 +765,7 @@ open class Heimdall {
 /// Arithmetic
 ///
 
-private func ==(lhs: Heimdall.ScopeOptions, rhs: Heimdall.ScopeOptions) -> Bool {
+public func ==(lhs: Heimdall.ScopeOptions, rhs: Heimdall.ScopeOptions) -> Bool {
     return lhs.rawValue == rhs.rawValue
 }
 
