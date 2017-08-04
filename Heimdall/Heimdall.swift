@@ -74,6 +74,25 @@ open class Heimdall {
         }
     }
     
+    public convenience init?(
+        publicTag: String,
+        publicKeyData: Data? = nil,
+        privateTag: String,
+        privateKeyData: Data? = nil) {
+         if let publicData = publicKeyData?.dataByStrippingX509Header(),
+            let _ = Heimdall.insertPublicKey(publicTag, data: publicData),
+        let privateData = privateKeyData?.dataByStrippingX509Header()
+         {
+            _ = Heimdall.updateKey(privateTag, data: privateData)
+            // Successfully created the new key
+            self.init(scope: ScopeOptions.PublicKey, publicTag: publicTag, privateTag: privateTag)
+        } else {
+            // Call the init, although returning nil
+            self.init(scope: ScopeOptions.PublicKey, publicTag: publicTag, privateTag: nil)
+            return nil
+        }
+    }
+    
     ///
     /// Create an instance with the modulus and exponent of the public key
     /// the resulting key is added to the keychain (call .destroy() to remove)
